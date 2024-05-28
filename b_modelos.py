@@ -26,28 +26,6 @@ tabla=pd.read_csv(tabla_hist)
 #figure(figsize=(20,6))
 #sns.heatmap(tabla_hist.corr(),cmap = sns.cubehelix_palette(as_cmap=True), annot = True, fmt = ".2f")
 
-xtrain=tabla_hist.iloc[:,:-1]
-ytrain=tabla_hist["NoPaidPerc"]
-
-colum_numericas=xtrain.select_dtypes(exclude='object').columns
-colum_categoricas=xtrain.select_dtypes(include='object').columns
-
-column_transformer = ColumnTransformer([
-    ('scaler', StandardScaler(), colum_numericas),
-    ('onehot', OneHotEncoder(), colum_categoricas)
-     ], remainder='passthrough')
-
-
-xtrain=column_transformer.fit_transform(xtrain)
-
-
-
-rfr=RandomForestRegressor()
-scores = cross_val_score(rfr, xtrain, ytrain, cv=20, scoring='r2')
-
-
-
-
 #Separación de variables explicativas con variable objetivo.
 dfx=tabla.iloc[:,:-1]
 dfy=tabla.iloc[:,-1]
@@ -238,38 +216,22 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 # Calcula el MSE
 mse = mean_squared_error(dfy, ypredrfr)
-print("Mean Squared Error (MSE):", mse)
-
 # Calcula el RMSE
 rmse = np.sqrt(mse)
-print("Root Mean Squared Error (RMSE):", rmse)
-
 # Calcula el MAE
 mae = mean_absolute_error(dfy, ypredrfr)
-print("Mean Absolute Error (MAE):", mae)
-
 # Calcula el R2
 r2 = r2_score(dfy, ypredrfr)
-print("R-squared (R2):", r2)
-
 lista1=[mse, rmse,mae,r2]
 
 # Calcula el MSE
 mse = mean_squared_error(dfy, ypredgbr)
-print("Mean Squared Error (MSE):", mse)
-
 # Calcula el RMSE
 rmse = np.sqrt(mse)
-print("Root Mean Squared Error (RMSE):", rmse)
-
 # Calcula el MAE
 mae = mean_absolute_error(dfy, ypredgbr)
-print("Mean Absolute Error (MAE):", mae)
-
 # Calcula el R2
 r2 = r2_score(dfy, ypredgbr)
-print("R-squared (R2):", r2)
-
 lista2=[mse,rmse,mae,r2]
 
 lista3= ["Mean Squared Error (MSE)","Root Mean Squared Error (RMSE)","Mean Absolute Error (MAE)","R-squared (R2)"]
@@ -293,9 +255,8 @@ scaler.fit(df_dum)
 xnor=scaler.transform(df_dum)
 xtest=pd.DataFrame(xnor,columns=df_dum.columns)
 xtest.drop(columns=["ID"],inplace=True)
-len(xtest.columns)
-len(xtrainf.columns)
-plt.hist(y)
+
+plt.hist(y) #monto de prestamo
 xtest=xtest.reindex(columns=xtrainf.columns)
 ypredtestrfr=rfr_final.predict(xtest)
 
