@@ -264,6 +264,36 @@ plt.hist(ypredtestrfr, bins=50)
 
 dict = {"ID":tabla_nuevos["ID"], "int_rc":ypredtestrfr}
 excel=pd.DataFrame(dict)
-excel["int_rc"]=excel["int_rc"].apply(lambda x: x + 0.15 )
+#excel["int_rc"]=excel["int_rc"].apply(lambda x: x + 0.15 )
+#excel.to_excel("Predicciones.xlsx",index=False)
 
-excel.to_excel("Predicciones.xlsx",index=False)
+
+excelf=pd.concat([excel, pd.DataFrame(y)], axis=1)
+
+def funcion(x):
+    if x<50000:
+        return 0.005
+    elif x<100000:
+        return 0.01
+    elif x<150000:
+        return 0.015
+    elif x<200000:
+        return 0.02
+    elif x<250000:
+        return 0.025
+    elif x<300000:
+        return 0.03
+    else:
+        return 0.04
+excelf["interes_final"]=excelf.apply(lambda x: x["int_rc"]+funcion(x["NewLoanApplication"]),axis=1)
+
+
+
+plt.figure(figsize=(10, 6))
+plt.hist(excelf['interes_final'], bins=50, color='blue', alpha=0.5, label='interes_final')
+plt.hist(excelf['int_rc'], bins=50, color='red', alpha=0.5, label='int_rc')
+plt.legend()
+plt.xlabel('Valores')
+plt.ylabel('Frecuencia')
+plt.title('Histograma de intereses')
+plt.show()
