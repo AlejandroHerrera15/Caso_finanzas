@@ -300,6 +300,7 @@ import math
 def funcion(x):
   return (math.exp(x["NewLoanApplication"]/(np.max(dfex["NewLoanApplication"])*100))-1)
 
+
 dfex["int_rc"]=dfex.apply(lambda x: x["int_prev"]+funcion(x),axis=1)
 dfex["diferencia"]=dfex["int_rc"]-dfex["int_prev"]
 plt.figure(figsize=(10, 6))
