@@ -211,6 +211,22 @@ df2["tipo"]=df2["tipo"].apply(lambda x: "real"if x=="y" else "predicho")
 
 sns.histplot(data=df2, x="valor", hue="tipo")
 
+#Entrenamiento con propuesta########################################
+#En la tabla de entrenamiento no se incluye el valor del prestamo
+"""
+rfr_final = joblib.load('salidas/rfr_final.pkl')
+ypredrfr=rfr_final.predict(xtrainf)
+sns.set_theme(style="ticks")
+dict={"y":dfy,"ypredrfr":ypredrfr}
+df1=pd.DataFrame(dict)
+df1["propuesta"]=df1.apply(lambda x: x["ypredrfr"]+funcion(x),axis=1)
+df1=df1.stack().reset_index()
+df1.drop(columns=["level_0"],inplace=True)
+df1.columns=["tipo","valor"]
+df1["tipo"]=df1["tipo"].apply(lambda x: "real"if x=="y" else "predicho")
+
+sns.histplot(data=df1, x="valor", hue="tipo")
+"""
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 #Metricas comparacion
 
@@ -256,18 +272,40 @@ xnor=scaler.transform(df_dum)
 xtest=pd.DataFrame(xnor,columns=df_dum.columns)
 xtest.drop(columns=["ID"],inplace=True)
 
+xtrainf = joblib.load('salidas/xtrainf.pkl')
+
 plt.hist(y) #monto de prestamo
 xtest=xtest.reindex(columns=xtrainf.columns)
 ypredtestrfr=rfr_final.predict(xtest)
 
 plt.hist(ypredtestrfr, bins=50)
 
-dict = {"ID":tabla_nuevos["ID"], "int_rc":ypredtestrfr}
-excel=pd.DataFrame(dict)
+dict = {"ID":tabla_nuevos["ID"], "int_prev":ypredtestrfr,"NewLoanApplication":y}
+dfex=pd.DataFrame(dict)
 #excel["int_rc"]=excel["int_rc"].apply(lambda x: x + 0.15 )
 #excel.to_excel("Predicciones.xlsx",index=False)
 
 
+import math
+
+def funcion(x):
+  return (math.exp(x["NewLoanApplication"]/(np.max(x["NewLoanApplication"])*100))-1)
+
+dfex["int_rc"]=dfex.apply(lambda x: x["int_prev"]+funcion(x),axis=1)
+
+plt.figure(figsize=(10, 6))
+plt.hist(dfex['int_prev'], bins=50, color='blue', alpha=0.5, label='int_prev')
+plt.hist(dfex['int_rc'], bins=50, color='red', alpha=0.5, label='int_rc')
+plt.legend()
+plt.xlabel('Valores')
+plt.ylabel('Frecuencia')
+plt.title('Histograma de intereses')
+plt.show()
+
+#Generacion de tabla
+excel=dfex[["ID","int_rc"]]
+excel.to_csv("Predicciones.csv",index=False)
+"""
 excelf=pd.concat([excel, pd.DataFrame(y)], axis=1)
 
 def funcion(x):
@@ -297,3 +335,8 @@ plt.xlabel('Valores')
 plt.ylabel('Frecuencia')
 plt.title('Histograma de intereses')
 plt.show()
+"""
+
+
+
+
