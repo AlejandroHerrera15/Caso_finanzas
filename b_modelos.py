@@ -289,9 +289,10 @@ dfex=pd.DataFrame(dict)
 import math
 
 def funcion(x):
-  return (math.exp(x["NewLoanApplication"]/(np.max(x["NewLoanApplication"])*100))-1)
+  return x["int_prev"]+(math.exp(x["NewLoanApplication"]/(dfex["NewLoanApplication"].max()*100))-1)
 
-dfex["int_rc"]=dfex.apply(lambda x: x["int_prev"]+funcion(x),axis=1)
+dfex["int_rc"]=dfex.apply(funcion,axis=1)
+
 dfex["diferencia"]=dfex["int_rc"]-dfex["int_prev"]
 plt.figure(figsize=(10, 6))
 plt.hist(dfex['int_prev'], bins=50, color='blue', alpha=0.5, label='int_prev')
@@ -336,9 +337,3 @@ plt.ylabel('Frecuencia')
 plt.title('Histograma de intereses')
 plt.show()
 """
-
-(0.269406+ (math.exp(37752/(np.max(dfex["NewLoanApplication"])*100))-1 ))
-
-0.279456 - 0.269406	
-0.248082 - 0.238031	
-0.287856 - 0.277806
