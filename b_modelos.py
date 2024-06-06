@@ -286,12 +286,19 @@ dfex=pd.DataFrame(dict)
 #excel.to_excel("Predicciones.xlsx",index=False)
 
 
+
+
+
+#### Función ######
+
+dfex=pd.read_csv("Predicciones.csv")
+dfex['NewLoanApplication']=tabla_nuevos["NewLoanApplication"]
+dfex.rename(columns = {'int_rc':'int_prev'}, inplace = True)
+
+
 import math
-
 def funcion(x):
-  return x["int_prev"]+(math.exp(x["NewLoanApplication"]/(dfex["NewLoanApplication"].max()*100))-1)
-
-dfex["int_rc"]=dfex.apply(funcion,axis=1)
+  return (math.exp(x["NewLoanApplication"]/(np.max(x["NewLoanApplication"])*100))-1)
 
 dfex["diferencia"]=dfex["int_rc"]-dfex["int_prev"]
 plt.figure(figsize=(10, 6))
@@ -303,9 +310,10 @@ plt.ylabel('Frecuencia')
 plt.title('Histograma de intereses')
 plt.show()
 
+
 #Generacion de tabla
 excel=dfex[["ID","int_rc"]]
-excel.to_csv("Predicciones.csv",index=False)
+excel.to_csv("Predicciones2.csv",index=False)
 """
 excelf=pd.concat([excel, pd.DataFrame(y)], axis=1)
 
@@ -337,3 +345,9 @@ plt.ylabel('Frecuencia')
 plt.title('Histograma de intereses')
 plt.show()
 """
+
+(0.269406+ (math.exp(37752/(np.max(dfex["NewLoanApplication"])*100))-1 ))
+
+0.279456 - 0.269406	
+0.248082 - 0.238031	
+0.287856 - 0.277806
